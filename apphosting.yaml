@@ -1,0 +1,5 @@
+# Este archivo define los recursos de App Hosting.
+# Para obtener más información, consulta la documentación.
+
+endpoints:
+  - id: app
