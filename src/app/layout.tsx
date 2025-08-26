@@ -1,12 +1,15 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+// import { Inter } from 'next/font/google';
 import './globals.css';
 import { GlobalClientComponents } from '@/components/shared/client-components';
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-});
+// Temporary comment out Google Fonts to fix build issues
+// const inter = Inter({
+//   subsets: ['latin'],
+//   variable: '--font-inter',
+//   display: 'swap',
+//   fallback: ['system-ui', 'arial'],
+// });
 
 export const metadata: Metadata = {
   title: {
@@ -79,8 +82,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" suppressHydrationWarning className={inter.variable}>
-      <head />
+    <html lang="es" suppressHydrationWarning>
+      <head>
+        <link 
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" 
+          rel="stylesheet"
+        />
+      </head>
       <body>
         <ThemeInitializationScript />
         {children}

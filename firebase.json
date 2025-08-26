@@ -21,7 +21,20 @@
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "**/src/**",
+      "**/functions/**",
+      "**/docs/**",
+      "**/.git/**",
+      "**/.vscode/**",
+      "**/README*.md",
+      "**/package*.json",
+      "**/tsconfig*.json",
+      "**/tailwind.config.*",
+      "**/postcss.config.*",
+      "**/next.config.*",
+      "**/components.json",
+      "**/*.code-workspace"
     ],
     "frameworksBackend": {
       "region": "us-central1"
