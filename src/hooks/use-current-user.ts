@@ -67,7 +67,8 @@ export const useSessionStore = create<SessionState>()(
                     'subscriptionStatus',
                     'trialStartDate',
                     'trialDurationDays',
-                    'onboardingCompleted'
+                    'onboardingCompleted',
+                    'authToken'  // Clear the authentication token
                 ];
                 keysToRemove.forEach(key => localStorage.removeItem(key));
             }

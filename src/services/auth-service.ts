@@ -1,5 +1,4 @@
 // src/services/auth-service.ts
-'use server';
 
 import type { RegisterFormValues, LoginFormValues } from '@/types/auth-schemas';
 import type { ClinicUser } from '@/types/user';
@@ -15,79 +14,84 @@ interface LoginResponse {
   };
 }
 
-// Habilitando un usuario temporal para revisión
-const mockUsers: Record<string, LoginResponse> = {
-    'admin@videre.cr': {
-        user: {
-            id: 'user-admin-01',
-            name: 'Admin Videre',
-            email: 'admin@videre.cr',
-            role: 'Admin',
-            status: 'Active',
-            createdAt: new Date().toISOString(),
-        },
-        token: `mock-token-admin-${Date.now()}`,
-        subscription: {
-            plan: 'Premium',
-            status: 'active',
-        }
-    }
-};
+const API_BASE_URL = 'https://us-central1-videre-saas-26178.cloudfunctions.net/api';
 
 
 export async function login(credentials: LoginFormValues): Promise<LoginResponse> {
-    console.log("Attempting mock login for:", credentials.email);
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            // NOTE: The password is not checked in this mock implementation.
-            const userData = mockUsers[credentials.email];
-            if (userData) {
-                console.log("Mock login successful for:", credentials.email);
-                resolve(userData);
-            } else {
-                console.log("Mock login failed for:", credentials.email);
-                reject(new Error("Correo o contraseña incorrectos."));
-            }
-        }, 500);
+    console.log("Attempting login for:", credentials.email);
+    
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            email: credentials.email,
+            password: credentials.password,
+        }),
     });
+
+    if (!response.ok) {
+        const errorData = await response.text();
+        console.error("Login failed:", errorData);
+        throw new Error("Correo o contraseña incorrectos.");
+    }
+
+    const data = await response.json();
+    
+    // Store the authentication token for future API calls
+    if (data.token && typeof window !== 'undefined') {
+        localStorage.setItem('authToken', data.token);
+    }
+    
+    console.log("Login successful for:", credentials.email);
+    return data;
 }
 
 export async function register(formData: RegisterFormValues, plan: string): Promise<LoginResponse> {
-     console.log("Attempting mock registration for:", formData.email);
-    return new Promise((resolve, reject) => {
-         setTimeout(() => {
-            if (mockUsers[formData.email]) {
-                reject(new Error("Este correo electrónico ya está registrado."));
-                return;
-            }
-            const newUser: ClinicUser = {
-                id: `user-${Date.now()}`,
-                name: `${formData.firstName} ${formData.lastName}`,
-                email: formData.email,
-                role: 'Admin',
-                status: 'Active',
-                createdAt: new Date().toISOString(),
-            };
-            const subscription = {
-                plan: plan || 'Premium',
-                status: 'trialing',
-                trialStartDate: new Date().toISOString(),
-                trialDurationDays: 3,
-            }
-            const newLoginResponse: LoginResponse = {
-                user: newUser,
-                token: `mock-token-${Date.now()}`,
-                subscription
-            };
-            // Add to mock users so they can log in next time
-            mockUsers[formData.email] = newLoginResponse;
-            console.log("Mock registration successful:", newUser);
-            resolve(newLoginResponse);
-        }, 500);
+    console.log("Attempting registration for:", formData.email);
+    
+    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+            clinicName: formData.clinicName,
+            userName: `${formData.firstName} ${formData.lastName}`,
+        }),
     });
+
+    if (!response.ok) {
+        const errorData = await response.text();
+        console.error("Registration failed:", errorData);
+        
+        // Handle common registration errors
+        if (response.status === 409) {
+            throw new Error("Este correo electrónico ya está registrado.");
+        }
+        throw new Error("Error en el registro. Por favor intenta de nuevo.");
+    }
+
+    const data = await response.json();
+    
+    // Store the authentication token for future API calls
+    if (data.token && typeof window !== 'undefined') {
+        localStorage.setItem('authToken', data.token);
+    }
+    
+    console.log("Registration successful for:", formData.email);
+    return data;
 }
 
 export async function logout(): Promise<void> {
-  // Client-side logic in useCurrentUser store will handle clearing state.
+  // Clear the authentication token
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('authToken');
+  }
+  
+  // Client-side logic in useCurrentUser store will handle clearing other state.
   return Promise.resolve();
 }
