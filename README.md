@@ -23,6 +23,32 @@ Para poner en marcha el entorno de desarrollo local, sigue estos pasos:
 3.  **Abrir en el Navegador:**
     Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la aplicación en funcionamiento.
 
+## 🌐 Despliegue Automático
+
+Este proyecto está configurado con **despliegue automático a Firebase Hosting**:
+
+### Configuración Actual
+- **Proyecto Firebase**: `videre-saas-26178`
+- **Despliegue en producción**: Automático al hacer push a la rama `main`
+- **Previews de PR**: Se generan automáticamente para cada Pull Request
+
+### Prerequisites para Despliegue
+- El repositorio debe tener configurado el secret `FIREBASE_SERVICE_ACCOUNT_VIDERE_SAAS_26178`
+- Firebase CLI configurado con el proyecto `videre-saas-26178`
+- Node.js 18+ para el proceso de build
+
+### Comandos de Build
+```bash
+# Instalar dependencias
+npm ci
+
+# Build para producción
+npm run build
+
+# Desplegar manualmente (requiere Firebase CLI)
+firebase deploy --only hosting
+```
+
 ## 🛠️ Estructura del Proyecto
 
 -   **/src/app**: Contiene todas las rutas y páginas de la aplicación, siguiendo la estructura del App Router de Next.js.

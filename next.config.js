@@ -23,6 +23,10 @@ const nextConfig = {
       },
     ],
   },
+  // Enable compression for better performance
+  compress: true,
+  // Optimize for Firebase Hosting
+  trailingSlash: false,
 };
 
 module.exports = nextConfig;
